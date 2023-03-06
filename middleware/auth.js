@@ -6,6 +6,8 @@ const User = require("../models/userModel");
 
 const catchAsyncErrors = require("./catchAsynErrors");
 
+//  is authenticate user or not 
+
 exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
 
   const { token } = req.cookies;
@@ -21,7 +23,7 @@ exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
 
 });
 
-
+// authorizeRoles 
 exports.authorizeRoles = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {

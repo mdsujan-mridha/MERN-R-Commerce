@@ -1,24 +1,33 @@
-const nodeMailer = require("nodeMailer")
+const nodemailer = require("nodemailer");
+const sendToken = require("../utils/jwtToken");
+
+const sendEmail = async (options) => {
+    let testAccount = await nodemailer.createTestAccount();
+    const transporter = nodemailer.createTransport({
+        host: 'smtp.ethereal.email',
+        port: 587,
+
+        secure:false,
+
+        // service: "gmail",
+        auth: {
+            // type:"OAuth2",
+            user: 'hans.koepp11@ethereal.email',
+            pass: '9Nbk4u9GBgDZjMBp9n'
+            // accessToken: ,
+        },
+
+    });
 
 
-const sendEmail = async(options) =>{
-
-const transporter = nodeMailer.createTransport({
-    service:process.env.SMTP_SERVICE,
-    auth:{
-        user:process.env.SMTP_MAIL,
-        password:process.env.SMTP_PASSWORD
+    const mailOptions = {
+        from: "sujan@gmail.com",
+        to: options.email,
+        subject: options.subject,
+        text: options.message
     }
-})
 
-const mailOptions = {
-    from:process.env.SMTP_MAIL,
-    to:options.email,
-    subject:options.subject,
-    text:options.message
-}
-
-await transporter.sendMail(mailOptions);
+    await transporter.sendMail(mailOptions);
 
 }
 
