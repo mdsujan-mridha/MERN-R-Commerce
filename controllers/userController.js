@@ -214,11 +214,49 @@ exports.getAllUser = catchAsyncErrors(async (req, res, next) => {
   const user = await User.findById(req.params.id);
 
   if (!user) {
-     return next(new ErrorHandler(`user does not exist id :${req.params.id}`));
+    return next(new ErrorHandler(`user does not exist id :${req.params.id}`));
   }
 
   res.status(200).json({
     success: true,
     user,
+  })
+});
+
+// update user role 
+exports.updateUserRole = catchAsyncErrors(async (req, res, next) => {
+  const newUserData = {
+    name: req.body.name,
+    email: req.body.email,
+    role: req.body.role,
+  };
+
+  await User.findByIdAndUpdate(req.params.id, newUserData, {
+    new: true,
+    runValidators: true,
+    useFindAndModify: false,
+  });
+
+  res.status(200).json({
+    success: true,
+  });
+});
+
+
+
+// DELETE USER
+
+exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+  // there user params bcz this request will send by admin bt is this request will send bt user then i write (req.user.id)
+  if (!user) {
+    {
+      return next(new ErrorHandler(`User does not exist with id : ${req.params.id}`, 400));
+    }
+  }
+  await user.remove();
+  res.status(200).json({
+    success: true,
+    message: "user deleted Successfully",
   })
 })
