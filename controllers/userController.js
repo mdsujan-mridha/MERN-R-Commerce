@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const ErrorHandler = require("../utils/ErrorHandler");
+const cloudinary = require("cloudinary");
 // this function for cath async error like when i post a new product but i didn't write product name but product name is require field then this function show the error or message 
 const catchAsyncErrors = require('../middleware/catchAsynErrors');
 
@@ -9,13 +10,19 @@ const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
 // register new user 
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
-
-  const { name, email, password, avatar } = req.body;
+    
+  const mycloud = await cloudinary.v2.uploader.upload(req.body.avatar,{
+    folder:"avater",
+    width:150,
+    crop:"scale",
+  })
+    
+  const { name, email, password } = req.body;
   const user = await User.create({
     name, email, password,
     avatar: {
-      public_id: "This is a sample id",
-      url: "profilePicUrl",
+      public_id: mycloud.public_id,
+      url: mycloud.secure_url,
     }
   });
 
@@ -31,7 +38,7 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return next(new ErrorHandler("plx Enter valid email & password", 400));
+    return next(new ErrorHandler("plz Enter valid email & password", 400));
   }
 
   const user = await User.findOne({ email }).select("+password");
@@ -84,7 +91,7 @@ exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
   try {
     await sendEmail({
       email: user.email,
-      subject: `Ecommerce Password Recovery`,
+      subject: `E-commerce Password Recovery`,
       message,
     });
 
@@ -181,14 +188,25 @@ exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
   };
 
   //  add cloudinary 
-
+  if(req.body.avatar !== ""){
+     const user = await User.findById(req.user.id);
+     const imageId = user.avatar.public_id;
+     await cloudinary.v2.uploader.destroy(imageId);
+     const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar,{
+      folder: "avater",
+      width:150,
+      crop:"scale",
+     });
+    newUserData.avatar ={
+      public_id: mycloud.public_id,
+      url: mycloud.secure_url,
+    }; 
+  }
   const user = await User.findOneAndUpdate(req.user.id, newUserData, {
     new: true,
     runValidators: true,
     useFindAndModify: false
   });
-
-
 
   res.status(200).json({
     success: true,

@@ -18,21 +18,31 @@ exports.createProduct = catchAsyncErrors(async (req, res, next) => {
 });
 
 // get all products 
-exports.getAllProducts = catchAsyncErrors(async (req, res) => {
+exports.getAllProducts = catchAsyncErrors(async (req, res,next) => {
       
+    // return next(new ErrorHandler("This is my temp error",500));
     // pagination 
 
-    const resultPerPage = 5;
-    const productCount = await Product.countDocuments();
+    const resultPerPage = 4;
+    const productsCount = await Product.countDocuments();
 
 
-    const apiFeature = new ApiFeatures(Product.find(),req.query).search().filter().pagination(resultPerPage);
+    const apiFeature = new ApiFeatures(Product.find(),req.query)
+    .search()
+    .filter();
 
-    const products = await apiFeature.query;
+    let products = await apiFeature.query;
+    let filteredProductsCount = products.length;
+    apiFeature.pagination(resultPerPage);
+
+    products = await apiFeature.query.clone();
 
     res.status(200).json({
         success: true,
-        products
+        products,
+        productsCount,
+        resultPerPage,
+        filteredProductsCount,
     })
 })
 
@@ -47,7 +57,7 @@ exports.getAllProductDetails = catchAsyncErrors(async (req, res, next) => {
     res.status(200).json({
         success: true,
         product,
-        productCount
+        // productsCount
 
     });
 
