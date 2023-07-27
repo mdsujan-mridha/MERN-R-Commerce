@@ -4,16 +4,14 @@ const sendToken = require("../utils/jwtToken");
 const sendEmail = async (options) => {
     let testAccount = await nodemailer.createTestAccount();
     const transporter = nodemailer.createTransport({
-        host: 'smtp.ethereal.email',
-        port: 587,
-
+        host: process.env.SMTP_HOST,
+        port: process.env.SMTP_PORT,
         secure:false,
-
-        // service: "gmail",
+        service: process.env.SMTP_SERVICE,
         auth: {
             // type:"OAuth2",
-            user: 'hans.koepp11@ethereal.email',
-            pass: '9Nbk4u9GBgDZjMBp9n'
+            user: process.env.SMTP_MAIL,
+            pass: process.env.appPassword
             // accessToken: ,
         },
 

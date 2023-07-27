@@ -15,7 +15,7 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
     folder:"avater",
     width:150,
     crop:"scale",
-  })
+  });
     
   const { name, email, password } = req.body;
   const user = await User.create({
@@ -84,8 +84,11 @@ exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
 
   await user.save({ validateBeforeSave: false });
 
-  const resetPasswordUrl = `${req.protocol}://${req.get("host")}/password/reset/${resetToken}`;
-
+  //  deploy korar time ai ta use kora lagbe tai akhon comment kore dilm
+  // const resetPasswordUrl = `${req.protocol}://${req.get("host")}/api/v1/password/reset/${resetToken}`;
+  
+// demo url 
+const resetPasswordUrl = `${process.env.FRONTEND_URL}/password/reset/${resetToken}`;
   const message = `Your password reset token is :- \n\n ${resetPasswordUrl} \n\nIf you have not requested this email then, please ignore it.`;
 
   try {
@@ -198,11 +201,11 @@ exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
       crop:"scale",
      });
     newUserData.avatar ={
-      public_id: mycloud.public_id,
-      url: mycloud.secure_url,
+      public_id: myCloud.public_id,
+      url: myCloud.secure_url,
     }; 
   }
-  const user = await User.findOneAndUpdate(req.user.id, newUserData, {
+  const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
     new: true,
     runValidators: true,
     useFindAndModify: false
