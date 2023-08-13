@@ -41,7 +41,10 @@ router.route("/me/updateProfile").put(isAuthenticatedUser, updateProfile);
 router.route("/admin/users").get(isAuthenticatedUser, authorizeRoles("admin"), getAllUsers);
 
 // get a single user 
-router.route("/admin/user/:id").get(isAuthenticatedUser, authorizeRoles("admin"), getAllUser).put(isAuthenticatedUser,authorizeRoles("admin"),updateUserRole);
+router.route("/admin/user/:id")
+.get(isAuthenticatedUser, authorizeRoles("admin"), getAllUser)
+.put(isAuthenticatedUser,authorizeRoles("admin"),updateUserRole)
+.delete(isAuthenticatedUser ,authorizeRoles("admin"),deleteUser);
 
 // update user role 
 

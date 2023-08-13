@@ -3,11 +3,28 @@ const ErrorHandler = require("../utils/ErrorHandler");
 // this function for cath async error like when i post a new product but i didn't write product name but product name is require field then this function show the error or message 
 const catchAsyncErrors = require('../middleware/catchAsynErrors');
 const ApiFeatures = require("../utils/apiFeatures");
-
+const cloudinary = require("cloudinary");
 
 // create product -- admin
 
 exports.createProduct = catchAsyncErrors(async (req, res, next) => {
+    let images = [];
+    if(typeof req.body.images === "string"){
+        images.push(req.body.images);
+    }else{
+        images = req.body.images;
+    }
+    const imageLink = [];
+    for(let i = 0;i<images.length;i++){
+        const result = await cloudinary.v2.uploader.upload(images[i],{
+            folder:"products",
+        });
+        imageLink.push({
+            public_id:result.public_id,
+            url:result.secure_url,
+        });
+    }
+    req.body.images = imageLink;
     req.body.user = req.user.id;
     
     const product = await Product.create(req.body);
@@ -151,7 +168,7 @@ exports.getProductReviews = catchAsyncErrors(async(req,res,next) =>{
   
     res.status(200).json({
          success:true,
-         review:product.reviews,
+         reviews:product.reviews,
     })
 });
 
@@ -196,4 +213,15 @@ exports.deleteReview = catchAsyncErrors(async(req,res,next) =>{
     res.status(200).json({
         success:true,
     });
+});
+
+// get all product by admin 
+
+exports.getAdminProduct  = catchAsyncErrors(async(req,res,next) =>{
+     const products = await Product.find();
+
+     res.status(200).json({
+        success:true,
+        products,
+     })
 })
