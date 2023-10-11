@@ -15,7 +15,7 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(fileUpload());
 const corsOptions = {
-    origin:'http://localhost:3000',
+    origin:'https://panda-mern.netlify.app/',
     'Content-Type': 'Authorization',
     "Content-type":"application/json",
     credentials: true,            //access-control-allow-credentials:true
